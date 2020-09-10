@@ -47,7 +47,7 @@ const getDataFromServer = async (m) => {
     // 由response物件，剖析出json資料
     const data = await response.json();
     // const data = await response.text();
-    // console.log(data);
+    console.log(data);
 
     //dispatch a card for player
     if(m==1){
@@ -71,7 +71,7 @@ const getDataFromServer = async (m) => {
       document.getElementById('b-result').innerHTML = '';
       timer =setInterval(()=>{
         setGame(data.card,data.total);
-      }, 600); 
+      }, 100); 
     }
     //banker's turn
     if(m==3){
@@ -88,16 +88,13 @@ const getDataFromServer = async (m) => {
         document.getElementById('dispatch').disabled = true;
         document.getElementById('over').disabled = true;
          //you lose
-        if(data.total < data.totalB){
+        if(data.total < data.totalB && data.totalB<=21){
           document.getElementById('b-result').innerHTML = '你輸了 大爛咖';
         }
-
         //平手
         if(data.total == data.totalB){
           document.getElementById('b-result').innerHTML = '平手';
-        }   
-
-        
+        }      
       }
     }
     
@@ -108,7 +105,13 @@ const getDataFromServer = async (m) => {
       document.getElementById('over').disabled = true;
     }
     if(data.totalB>21){
-      document.getElementById('b-result').innerHTML = `You Win`;
+      document.getElementById('result').innerHTML = `You Win`;
+      document.getElementById('dispatch').disabled = true;
+      document.getElementById('over').disabled = true;
+    }
+    if(document.getElementById('cards').childElementCount==5 && data.total < 21 ) {
+
+      document.getElementById('result').innerHTML = `You Win`;
       document.getElementById('dispatch').disabled = true;
       document.getElementById('over').disabled = true;
     }
@@ -177,7 +180,7 @@ const setGame = (cards,total)=>{
     }
   cards.pop();
 }
-
+//banker's Turn
 const bankerTurn=()=>{
     getDataFromServer(3);
 }

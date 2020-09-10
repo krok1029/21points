@@ -56,8 +56,8 @@ if ($method == 2) {
     $aceB = $card[2]['point'] == 1 ? $aceB + 1 : $aceB;
     $card[] = array_pop($cards);
     $ace = $card[3]['point'] == 1 ? $ace + 1 : $ace;
-    $total = calcTotal(calcPoint($card[1]['point']), calcPoint($card[3]['point']), $ace);
-    $totalB = calcTotal(calcPoint($card[0]['point']), calcPoint($card[2]['point']), $aceB);
+    $total = calcTotalB(calcPoint($card[1]['point']), calcPoint($card[3]['point']), $ace);
+    $totalB = calcTotalB(calcPoint($card[0]['point']), calcPoint($card[2]['point']), $aceB);
 
     $_SESSION['ace'] = $ace;
     $_SESSION['aceB'] = $aceB;
@@ -67,13 +67,13 @@ if ($method == 2) {
 }
 
 //dispatch to banker
-if ($method == 3 && $total > $totalB) {
+if ($method == 3 && ($total > $totalB || $totalB <= 17)) {
 
     $aceB = $_SESSION['aceB'];
     $card = array_pop($cards);
     if ($card['point'] == 1)
         $aceB += 1;
-    $totalB = calcTotal($totalB, calcPoint($card['point']), $aceB);
+    $totalB = calcTotalB($totalB, calcPoint($card['point']), $aceB);
     $_SESSION['cards'] = $cards; //設置Session變數
     $_SESSION['totalB'] = $totalB; //設置Session變數
     $_SESSION['aceB'] = $aceB;
@@ -103,7 +103,7 @@ function initCards()
     $cards = [];
     $suits = ['h', 'd', 's', 'c'];
     $points = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13];
-    // $points = [1, 2];
+    // $points = [1, 12];
     for ($i = 0; $i < count($suits); $i++) {
         for ($j = 0; $j < count($points); $j++) {
             $cards[] = (createCard($suits[$i], $points[$j]));
@@ -124,6 +124,16 @@ function calcPoint($point)
 }
 
 function calcTotal($p1, $p2, &$aceCnt)
+{
+    if ($p1 + $p2 >= 21 && $aceCnt >= 1) {
+        $aceCnt -= 1;
+        return $p1 + $p2 - 10;
+    } else if ($p1 + $p2 > 21 && $aceCnt == 0) {
+        return 100;
+    } else
+        return $p1 + $p2;
+}
+function calcTotalB($p1, $p2, &$aceCnt)
 {
     if ($p1 + $p2 > 21 && $aceCnt >= 1) {
         $aceCnt -= 1;
